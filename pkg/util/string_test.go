@@ -34,9 +34,9 @@ func TestRandHexString(t *testing.T) {
 	}{
 		{0, ""},
 		{3, "538"},
-		{5, "538c7"},
-		{10, "538c7f96b1"},
-		{10, "538c7f96b1"},
+		{5, "538C7"},
+		{10, "538C7F96B1"},
+		{10, "538C7F96B1"},
 	}
 
 	for _, test := range tests {

@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/hex"
 	"math/rand"
+	"strings"
 )
 
 const seed int64 = 42
@@ -56,5 +57,5 @@ func RandHexString(n int) string {
 	if extraByte == 1 {
 		hexStr = hexStr[:n]
 	}
-	return hexStr
+	return strings.ToUpper(hexStr)
 }
