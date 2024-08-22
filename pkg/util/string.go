@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/hex"
 	"math/rand"
+	"strings"
 )
 
 const seed int64 = 42
@@ -11,7 +12,7 @@ var randx = rand.NewSource(seed)
 
 // RandString returns a random hex string of length n.
 func RandString(n int) string {
-	const letterBytes = "abcdef0123456789"
+	const letterBytes = "ABCDEF0123456789"
 	const (
 		letterIdxBits = 6                    // 6 bits to represent a letter index
 		letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
@@ -56,5 +57,5 @@ func RandHexString(n int) string {
 	if extraByte == 1 {
 		hexStr = hexStr[:n]
 	}
-	return hexStr
+	return strings.ToUpper(hexStr)
 }

@@ -11,10 +11,10 @@ func TestRandString(t *testing.T) {
 		expected string
 	}{
 		{0, ""},
-		{3, "33e"},
-		{5, "de607"},
-		{10, "9e1dee6f7a"},
-		{10, "20e65b801c"},
+		{3, "33E"},
+		{5, "DE607"},
+		{10, "9E1DEE6F7A"},
+		{10, "20E65B801C"},
 	}
 
 	for _, test := range tests {
@@ -33,15 +33,15 @@ func TestRandHexString(t *testing.T) {
 		expected string
 	}{
 		{0, ""},
-		{3, "cb2"},
-		{5, "0400d"},
-		{10, "d814ba6367"},
-		{10, "3f9cfcba71"},
+		{3, "538"},
+		{5, "538C7"},
+		{10, "538C7F96B1"},
+		{10, "538C7F96B1"},
 	}
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%v", test.length), func(t *testing.T) {
-			actual := RandString(test.length)
+			actual := RandHexString(test.length)
 			if actual != test.expected {
 				t.Fatalf("length: %v, expected: %v, actual: %v", test.length, test.expected, actual)
 			}
