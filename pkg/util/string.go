@@ -6,9 +6,9 @@ import (
 
 var randx = rand.NewSource(42)
 
-// RandString returns a random string of length n.
+// RandString returns a random hex string of length n.
 func RandString(n int) string {
-	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	const letterBytes = "abcdef0123456789"
 	const (
 		letterIdxBits = 6                    // 6 bits to represent a letter index
 		letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
