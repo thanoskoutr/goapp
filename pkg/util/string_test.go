@@ -48,3 +48,47 @@ func TestRandHexString(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkRandString10(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandString(10)
+	}
+}
+func BenchmarkRandHexString10(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandHexString(10)
+	}
+}
+
+func BenchmarkRandString100(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandString(100)
+	}
+}
+func BenchmarkRandHexString100(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandHexString(100)
+	}
+}
+
+func BenchmarkRandString1000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandString(1000)
+	}
+}
+func BenchmarkRandHexString1000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandHexString(1000)
+	}
+}
+
+func BenchmarkRandString10000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandString(10000)
+	}
+}
+func BenchmarkRandHexString10000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = RandHexString(10000)
+	}
+}
