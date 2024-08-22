@@ -11,10 +11,10 @@ func TestRandString(t *testing.T) {
 		expected string
 	}{
 		{0, ""},
-		{3, "33e"},
-		{5, "de607"},
-		{10, "9e1dee6f7a"},
-		{10, "20e65b801c"},
+		{3, "33E"},
+		{5, "DE607"},
+		{10, "9E1DEE6F7A"},
+		{10, "20E65B801C"},
 	}
 
 	for _, test := range tests {
