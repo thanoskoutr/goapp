@@ -7,6 +7,7 @@ import (
 	"goapp/internal/pkg/watcher"
 	"log"
 	"net/url"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -19,7 +20,6 @@ func main() {
 		connections = flag.Int("n", 1, "Number of parallel WebSocket connections to open")
 	)
 	flag.Parse()
-	_ = connections
 
 	// URL of the WS server
 	u, err := url.Parse(serverURL)
@@ -27,9 +27,20 @@ func main() {
 		log.Fatal("Invalid server URL:", err)
 	}
 
-	// TODO: Implement parallel connections
-	// Connect to WS
-	connectWebSocket(u, 0)
+	// Wait for all connections
+	var wg sync.WaitGroup
+	wg.Add(*connections)
+
+	// Open specified number of WS connections
+	for i := 0; i < *connections; i++ {
+		go func(id int) {
+			defer wg.Done()
+			connectWebSocket(u, id)
+		}(i)
+	}
+
+	// Wait for all connections to complete
+	wg.Wait()
 }
 
 func connectWebSocket(u *url.URL, id int) {
