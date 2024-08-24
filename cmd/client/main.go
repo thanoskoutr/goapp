@@ -7,7 +7,10 @@ import (
 	"goapp/internal/pkg/watcher"
 	"log"
 	"net/url"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/gorilla/websocket"
 )
@@ -26,6 +29,12 @@ func main() {
 		log.Fatal("Invalid server URL:", err)
 	}
 
+	// Channel to signal termination
+	stopChan := make(chan struct{})
+
+	// Handle interrupt signals
+	go handleInterrupt(stopChan)
+
 	// Wait for all connections
 	var wg sync.WaitGroup
 	wg.Add(*connections)
@@ -34,7 +43,7 @@ func main() {
 	for i := 0; i < *connections; i++ {
 		go func(id int) {
 			defer wg.Done()
-			connectWebSocket(u, id)
+			connectWebSocket(u, id, stopChan)
 		}(i)
 	}
 
@@ -42,30 +51,50 @@ func main() {
 	wg.Wait()
 }
 
-func connectWebSocket(u *url.URL, id int) {
+func connectWebSocket(u *url.URL, id int, stopChan <-chan struct{}) {
 	// Connect to server
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
 		fmt.Printf("[conn #%d] Failed to connect: %v\n", id, err)
 		return
 	}
-	defer conn.Close()
+
+	// Close the WebSocket connection gracefully
+	defer func() {
+		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+		conn.Close()
+	}()
 
 	for {
-		// Read message from server
-		_, message, err := conn.ReadMessage()
-		if err != nil {
-			fmt.Printf("[conn #%d] Failed to read message: %v\n", id, err)
+		select {
+		case <-stopChan:
+			// Exit and close the connection
 			return
-		}
+		default:
+			// Read message from server
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				fmt.Printf("[conn #%d] Failed to read message: %v\n", id, err)
+				return
+			}
 
-		// Parse message as Counter
-		var counter watcher.Counter
-		err = json.Unmarshal(message, &counter)
-		if err != nil {
-			fmt.Printf("[conn #%d] Failed to parse message: %v\n", id, err)
-			return
+			// Parse message as Counter
+			var counter watcher.Counter
+			err = json.Unmarshal(message, &counter)
+			if err != nil {
+				fmt.Printf("[conn #%d] Failed to parse message: %v\n", id, err)
+				return
+			}
+			fmt.Printf("[conn #%d] iteration: %v, value: %v\n", id, counter.Iteration, counter.Value)
 		}
-		fmt.Printf("[conn #%d] iteration: %v, value: %v\n", id, counter.Iteration, counter.Value)
 	}
+}
+
+// handleInterrupt waits until a SIGINT or SIGTERM signal is received and closes
+// the stopChan channel.
+func handleInterrupt(stopChan chan struct{}) {
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+	close(stopChan)
 }
