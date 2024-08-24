@@ -12,17 +12,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const serverURL = "ws://localhost:8080/goapp/ws"
-
 func main() {
 	// Parse flags
 	var (
+		address     = flag.String("a", "localhost:8080", "Host address for connecting to WebSocket server")
 		connections = flag.Int("n", 1, "Number of parallel WebSocket connections to open")
 	)
 	flag.Parse()
 
 	// URL of the WS server
-	u, err := url.Parse(serverURL)
+	u, err := url.Parse(fmt.Sprintf("ws://%v/goapp/ws", *address))
 	if err != nil {
 		log.Fatal("Invalid server URL:", err)
 	}
