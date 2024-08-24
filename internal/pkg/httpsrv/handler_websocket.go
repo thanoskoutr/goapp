@@ -5,11 +5,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"goapp/internal/pkg/watcher"
 
 	"github.com/gorilla/websocket"
 )
+
+// checkSameOrigin returns true if the origin set and equal to the request host.
+func checkSameOrigin(r *http.Request) bool {
+	origin := r.Header["Origin"]
+	if len(origin) == 0 {
+		return true
+	}
+	u, err := url.Parse(origin[0])
+	if err != nil {
+		return false
+	}
+	return strings.EqualFold(u.Host, r.Host)
+}
 
 func (s *Server) handlerWebSocket(w http.ResponseWriter, r *http.Request) {
 	// Create and start a watcher.
@@ -25,9 +40,8 @@ func (s *Server) handlerWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	// Start WS.
 	var upgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
+		// Validate request origin to prevent CSRF attacks
+		CheckOrigin: checkSameOrigin,
 	}
 
 	c, err := upgrader.Upgrade(w, r, nil)
