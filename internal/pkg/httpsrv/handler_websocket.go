@@ -92,8 +92,7 @@ func (s *Server) handlerWebSocket(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case cv := <-watch.Recv():
-			data, _ := json.Marshal(cv)
-			err = c.WriteMessage(websocket.TextMessage, data)
+			err = c.WriteJSON(cv)
 			if err != nil {
 				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 					log.Printf("failed to write message: %v\n", err)
